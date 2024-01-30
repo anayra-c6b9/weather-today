@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { WeatherReportService } from './services/weather/weather-report.service';
 import { SharableService } from './services/sharables/sharable.service';
 import { Subscription } from 'rxjs';
@@ -12,6 +12,7 @@ import { weatherData, weatherError } from 'src/interfaces';
 })
 export class AppComponent {
   weatherSubscription: Subscription;
+  buttonStateSubscription: Subscription;
   weatherdata: weatherData | weatherError = {
     has_error: true,
     error: {
@@ -19,6 +20,7 @@ export class AppComponent {
       message: 'Add a location',
     },
   };
+  buttonState: boolean = false
 
   constructor(
     private sharableService: SharableService,
@@ -29,6 +31,30 @@ export class AppComponent {
         this.weatherdata = data;
       }
     );
+    this.buttonStateSubscription = this.sharableService.searchButtonState$.subscribe(
+      data => {
+        this.buttonState = data;
+      }
+    )
+  }
+
+  searchValue : string = ""
+  abcd = [1,2,3]
+
+  searchWeather = () => {
+    this.sharableService.getWeatherReport(this.searchValue)
+  }
+
+  toggleSearchState = () => {
+    if (this.buttonState) {
+      this.searchWeather()
+    } else {
+      setTimeout(() => {
+        const inputElement = document.getElementsByName("search-input")
+        inputElement[0].focus()
+      }, 10)
+    }
+    this.sharableService.toggleButtonState(!this.buttonState)
   }
 
   ngOnInit() {

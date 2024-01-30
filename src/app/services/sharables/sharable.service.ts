@@ -1,19 +1,32 @@
 import { Injectable } from '@angular/core';
 import { WeatherReportService } from '../weather/weather-report.service';
-import { weatherData, weatherError } from 'src/interfaces';
+import { weatherData, weatherError, weatherIconJsonCollection } from 'src/interfaces';
+import { Subject } from 'rxjs';
+import * as weatherIconData from "../../weathercode.json"
 
 @Injectable()
 export class SharableService {
-  constructor(private weatherService: WeatherReportService) {}
+  jsonData: weatherIconJsonCollection = weatherIconData
+  jsonDataSimplified: weatherIconJsonCollection = []
+
+  constructor(private weatherService: WeatherReportService) {
+    this.searchButtonStateSubject.next(false)
+    for(let i in this.jsonData) {
+      this.jsonDataSimplified.push(
+        this.jsonData[i]
+      )
+    }
+  }
 
   selectSpecifiedData = (res: any): weatherData => {
     const time = res.current.last_updated.split(' ')[1].split(':');
-    const hour =
-      parseInt(time[0]) % 12 < 10
-        ? '0'
-        : '' + (parseInt(time[0]) % 12).toString();
+    // console.log(((parseInt(time[0]) % 13) + Math.floor(parseInt(time[0]) / 12)).toString())
+    const hour = parseInt(time[0]) > 12 ? '0' + Math.floor(parseInt(time[0])/13).toString() : time[0]
     const min = time[1];
-    const prefix = parseInt(time[0]) > 11 ? 'PM' : 'AM';
+    const prefix = (parseInt(time[0]) > 11) ? 'PM' : 'AM';
+    const iconData = this.jsonDataSimplified.filter(x => x.code === res.current.condition.code)[0]
+    // console.log(this.jsonDataSimplified)
+    // console.log(iconData)
 
     const transformedReport: weatherData = {
       has_error: false,
@@ -21,6 +34,7 @@ export class SharableService {
       region: res.location.region,
       country: res.location.country,
       temperature: res.current.temp_c,
+      icon: (parseInt(time[0]) > 4 && parseInt(time[0]) < 18) ? iconData.day : iconData.night,
       condition: res.current.condition.text,
       wind_speed: res.current.wind_kph,
       humidity: res.current.humidity,
@@ -38,7 +52,7 @@ export class SharableService {
     return transformedReport;
   };
 
-  transformWeatherReport = (location: string) => {
+  private transformWeatherReport = (location: string) => {
     const address = location.trim();
 
     try {
@@ -91,13 +105,16 @@ export class SharableService {
     }
   };
 
-  createDummyWeatherData = () => {
-    return {
-      has_error: true,
-      error: {
-        code: 500,
-        message: 'Enter a location',
-      },
-    };
-  };
+  getWeatherReport = (query: string) => {
+    this.transformWeatherReport(query)
+  }
+
+  // search controller
+
+  private searchButtonStateSubject = new Subject<boolean>;
+  searchButtonState$ = this.searchButtonStateSubject.asObservable();
+
+  toggleButtonState = (state: boolean) => {
+      this.searchButtonStateSubject.next(state)
+  }
 }

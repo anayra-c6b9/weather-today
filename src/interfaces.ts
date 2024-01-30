@@ -1,9 +1,10 @@
 export interface weatherData {
-  has_error: boolean;
+  has_error: false;
   city: string;
   region: string;
   country: string;
   temperature: number;
+  icon: Array<string>;
   condition: string;
   wind_speed: number;
   humidity: number;
@@ -19,9 +20,17 @@ export interface weatherData {
 }
 
 export interface weatherError {
-  has_error: boolean;
+  has_error: true;
   error: {
     code: number;
     message: string;
   };
 }
+
+export interface weatherIconJson {
+  code: number;
+  day: Array<string>;
+  night: Array<string>;
+}
+
+export interface weatherIconJsonCollection extends Array<weatherIconJson> {}
