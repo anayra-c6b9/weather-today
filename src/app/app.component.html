@@ -1,65 +1,66 @@
 <main class="w-[382px] h-[586px] rounded-xl weather-card px-4 pt-6 text-white">
-  <nav class="flex flex-row justify-between items-center">
-    <section
-      class="flex flex-col align-start"
-    >
-      <h1 class="text-3xl">Kolkata</h1>
-      <h3 class="text-base">West Bengal, IN</h3>
-    </section>
-    <div
-      class="bg-white rounded-3xl w-12 h-12 flex justify-center items-center"
-    >
-      <button onclick="(() => {console.log('hello')})()">
-        <img src="assets/Search_4.svg" alt="search_icon" class="w-10 h-10">
+    <nav class="flex flex-row justify-between items-center">
+        <section class="flex flex-col align-start">
+            <ng-container *ngIf="weatherdata !== undefined && !weatherdata?.has_error">
+                <h1 class="text-3xl">{{ weatherdata?.city }}</h1>
+                <h3 class="text-base">
+                    {{ weatherdata?.region }}, {{ weatherdata?.country }}
+                </h3>
+            </ng-container>
+        </section>
+        <div class="bg-white rounded-3xl w-12 h-12 flex justify-center items-center">
+            <button onclick="(() => {console.log('hello')})()">
+        <img src="assets/Search_4.svg" alt="search_icon" class="w-10 h-10" />
       </button>
-    </div>
-  </nav>
-  <div class="flex flex-row justify-start items-center mt-12 px-3">
-    <section
-      class="flex flex-col align-start"
-    >
-      <h1 class="text-4xl">14&deg;C</h1>
-      <h3 class="text-base">Sunny</h3>
-    </section>
-    <section
-      class="w-20 h-20"
-    >
-      <img
-        src="assets/partly-cloudy-day.svg"
-        alt="partly-cloudy-day"
-        class="object-contain"
-      />
-    </section>
-  </div>
-  <div class="grid grid-cols-2 grid-rows-3 gap-3 gap-x-10 mt-3 px-6">
-    <div class="flex flex-col justify-center align-center">
-      <h3 class="text-base capitalize ">wind speed</h3>
-      <h2 class="text-2xl ">0.5 km/h</h2>
-        <!-- hells -->
-    </div>
-    <div class="flex flex-col">
-      <h3 class="text-base capitalize">humidity</h3>
-      <h2 class="text-2xl">90 %</h2>
-    </div>
-    <div class="flex flex-col">
-      <h3 class="text-base capitalize">precipitation</h3>
-      <h2 class="text-2xl">0 mm</h2>
-    </div>
-    <div class="flex flex-col">
-      <h3 class="text-base capitalize">visibility</h3>
-      <h2 class="text-2xl">14 km</h2>
-    </div>
-    <div class="flex flex-col">
-      <h3 class="text-base capitalize">wind direction</h3>
-      <h2 class="text-2xl">North</h2>
-    </div>
-    <div class="flex flex-col">
-      <h3 class="text-base capitalize">cloud cover</h3>
-      <h2 class="text-2xl">0 %</h2>
-    </div>
-  </div>
-  <footer class="text-center mt-12">
-    <img src="assets/Planet.svg" alt="planet" class="inline">
-    <span>Last observed at 12:14 PM</span>
-  </footer>
+        </div>
+    </nav>
+    <ng-container *ngIf="weather.has_error">{{ weatherdata?.error?.message }}
+    </ng-container>
+    <ng-container *ngIf="!weatherdata?.has_error">
+        <div class="flex flex-row justify-start items-center mt-12 px-3">
+            <section class="flex flex-col align-start">
+                <h1 class="text-4xl">{{ weatherdata?.temperature }}&deg;C</h1>
+                <h3 class="text-base">{{ weatherdata?.condition }}</h3>
+            </section>
+            <section class="w-20 h-20">
+                <img src="assets/partly-cloudy-day.svg" alt="partly-cloudy-day" class="object-contain" />
+            </section>
+        </div>
+        <div class="grid grid-cols-2 grid-rows-3 gap-3 gap-x-10 mt-3 px-6">
+            <div class="flex flex-col justify-center align-center">
+                <h3 class="text-base capitalize">wind speed</h3>
+                <h2 class="text-2xl">{{ weatherdata?.wind_speed }} km/h</h2>
+                <!-- hells -->
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-base capitalize">humidity</h3>
+                <h2 class="text-2xl">{{ weatherdata?.humidity }} %</h2>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-base capitalize">precipitation</h3>
+                <h2 class="text-2xl">{{ weatherdata?.precipitation }} mm</h2>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-base capitalize">visibility</h3>
+                <h2 class="text-2xl">{{ weatherdata?.precipitation }} km</h2>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-base capitalize">wind direction</h3>
+                <h2 class="text-2xl">{{ weatherdata?.wind_direction }}</h2>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-base capitalize">cloud cover</h3>
+                <h2 class="text-2xl">{{ weatherdata?.cloud_cover }} %</h2>
+            </div>
+        </div>
+        <footer class="text-center mt-12">
+            <img src="assets/Planet.svg" alt="planet" class="inline" />
+            <span>Last observed at
+        {{ (weatherdata as weatherData).last_updated.hour }}:{{
+          weatherdata?.last_updated?.minute
+        }}
+        {{ weatherdata?.last_updated?.prefix }}</span
+      >
+    </footer>
+  </ng-container>
 </main>

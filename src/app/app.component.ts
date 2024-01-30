@@ -1,29 +1,41 @@
 import { Component } from '@angular/core';
 import { WeatherReportService } from './services/weather/weather-report.service';
 import { SharableService } from './services/sharables/sharable.service';
+import { Subscription } from 'rxjs';
+import { weatherData, weatherError } from 'src/interfaces';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  providers: [SharableService]
+  providers: [SharableService],
 })
 export class AppComponent {
-  constructor (private weatherApiService: WeatherReportService) {}
+  weatherSubscription: Subscription;
+  weatherdata: weatherData | weatherError = {
+    has_error: true,
+    error: {
+      code: 101,
+      message: 'Add a location',
+    },
+  };
 
-  ngOnInit() {
-    try {
-      this.weatherApiService.getUserIp()
-      .then(res => {
-        return this.weatherApiService.getWeatherReport(res.ip)
-      })
-      .then(res => {
-        console.log(res)
-      })
-    } catch (error) {
-      console.log(error)
-    }
+  constructor(
+    private sharableService: SharableService,
+    private weatherService: WeatherReportService
+  ) {
+    this.weatherSubscription = this.weatherService.weatherData$.subscribe(
+      (data) => {
+        this.weatherdata = data;
+      }
+    );
   }
 
+  ngOnInit() {
+    this.sharableService.getInitialWeatherReport();
+  }
 
+  ngOnDestroy() {
+    this.weatherSubscription.unsubscribe();
+  }
 }
